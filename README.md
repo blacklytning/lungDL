@@ -1,16 +1,75 @@
-# React + Vite
+# LungDL – Lung X-Ray Grad-CAM App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A FastAPI-based web service for analyzing lung X-ray images using Grad-CAM visualization. Built with Python, PyTorch, and FastAPI.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* Predict lung conditions from X-ray images.
+* Visualize model predictions using Grad-CAM.
+* Lightweight FastAPI server for local development.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Prerequisites
 
-## Expanding the ESLint configuration
+* **OS**: Linux (tested on Arch Linux)
+* **Python**: 3.13+
+* **Node.js & npm**: for installing frontend dependencies
+* **Git**: to clone the repository
+* **uv CLI**: required for syncing Python environment. If not installed, follow the instructions at [https://uvcli.dev](https://uvcli.dev) to install it.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Setup Instructions
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/blacklytning/lungDL
+cd lungDL
+```
+
+### 2. Install Frontend Dependencies and Start Frontend
+
+```bash
+cd api
+npm install
+npm run dev
+```
+
+### 3. Sync Python Environment with `uv` CLI
+
+```bash
+uv sync
+```
+
+This will:
+
+* Detect your Python interpreter (`CPython 3.13.7`)
+* Create a virtual environment at `.venv`
+* Install all required Python packages
+
+### 4. Activate the Virtual Environment
+
+For **Fish shell**:
+
+```fish
+source .venv/bin/activate.fish
+```
+
+For **Zsh or Bash**:
+
+```zsh
+source .venv/bin/activate
+```
+
+After activation, your prompt should show `(api)` or similar.
+
+---
+
+### 5. Start the FastAPI Development Server
+
+```bash
+fastapi dev
+```
+
