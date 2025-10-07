@@ -40,6 +40,18 @@ async def root():
 # ---- Model + GradCAM utilities ----
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "model.pth")
+MODEL_NUM_CLASSES = int(os.getenv("MODEL_NUM_CLASSES", "3"))
+LABELS_PATH = os.path.join(os.path.dirname(__file__), "labels.json")
+
+# load optional labels mapping if present
+LABELS = None
+if os.path.exists(LABELS_PATH):
+    try:
+        import json
+        with open(LABELS_PATH, "r") as f:
+            LABELS = json.load(f)
+    except Exception:
+        LABELS = None
 
 
 def load_model(num_classes: int = None):
@@ -139,7 +151,8 @@ _MODEL = None
 def get_model():
     global _MODEL
     if _MODEL is None:
-        _MODEL = load_model()
+        # create model with expected number of classes
+        _MODEL = load_model(num_classes=MODEL_NUM_CLASSES)
     return _MODEL
 
 
@@ -189,6 +202,10 @@ async def predict(file: UploadFile = File(...)):
         probs = torch.softmax(out, dim=1).cpu().numpy()[0].tolist()
         pred_idx = int(np.argmax(probs))
 
+    label_name = None
+    if LABELS and 0 <= pred_idx < len(LABELS):
+        label_name = LABELS[pred_idx]
+
     # Grad-CAM (requires gradients so do a non-no-grad pass)
     try:
         gradcam = GradCAM(model, target_layer_name="features.16.conv")
@@ -200,9 +217,15 @@ async def predict(file: UploadFile = File(...)):
     except Exception:
         overlay_b64 = None
 
-    return JSONResponse({
+    resp = {
         "filename": file.filename,
         "prediction_index": pred_idx,
         "probabilities": probs,
         "gradcam_overlay_base64": overlay_b64,
-    })
+    }
+    # include labels list if available for frontend
+    if LABELS:
+        resp["labels"] = LABELS
+    if label_name:
+        resp["prediction_label"] = label_name
+    return JSONResponse(resp)
